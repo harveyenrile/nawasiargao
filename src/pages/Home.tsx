@@ -99,7 +99,7 @@ function HeroCarousel() {
 
   return (
     <div
-      className="relative w-full h-screen overflow-hidden bg-fg"
+      className="relative w-full h-[75vh] md:h-screen overflow-hidden bg-fg"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
