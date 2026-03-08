@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { useScrollReveal } from '../hooks/useScrollReveal'
@@ -64,6 +64,7 @@ const NAV_LINKS = [
 function HeroCarousel() {
   const [current, setCurrent] = useState(0)
   const [scrolled, setScrolled] = useState(false)
+  const touchStartX = useRef<number | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40)
@@ -85,8 +86,23 @@ function HeroCarousel() {
     return () => clearTimeout(id)
   }, [current, next])
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return
+    const delta = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(delta) > 40) delta > 0 ? next() : prev()
+    touchStartX.current = null
+  }
+
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-fg">
+    <div
+      className="relative w-full h-screen overflow-hidden bg-fg"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* ── Slides ── */}
       {SLIDES.map((slide, i) => (
         <div
@@ -178,7 +194,7 @@ function HeroCarousel() {
       <button
         onClick={prev}
         aria-label="Previous slide"
-        className="absolute left-5 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center
+        className="absolute left-5 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 hidden md:flex items-center justify-center
                    text-cream/50 hover:text-cream transition-colors duration-300 focus:outline-none"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -189,7 +205,7 @@ function HeroCarousel() {
       <button
         onClick={next}
         aria-label="Next slide"
-        className="absolute right-5 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 flex items-center justify-center
+        className="absolute right-5 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 hidden md:flex items-center justify-center
                    text-cream/50 hover:text-cream transition-colors duration-300 focus:outline-none"
       >
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
