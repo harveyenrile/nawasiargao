@@ -76,7 +76,7 @@ export default function Stay() {
             <span className="text-muted font-light">The rest takes care of itself.</span>
           </h1>
           <p className="mt-8 text-muted text-base md:text-lg leading-relaxed max-w-xl">
-            Each room is designed for comfort without clutter — ensuite bath, AC, fast wifi, and a veranda to watch the sun over the palms.
+            Each room is designed for comfort without clutter, it features an ensuite bath, AC, fast wifi, and a veranda to watch the sun over the palms.
           </p>
         </div>
       </section>
