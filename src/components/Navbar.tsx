@@ -91,9 +91,7 @@ export default function Navbar() {
         }`}
       >
         <div className="flex flex-col justify-center h-full px-10 pb-16">
-          <div className="mb-12">
-            <img src="/logo-dark.png" alt="Nawá House" className="h-10 w-auto" />
-          </div>
+          
           <nav className="flex flex-col gap-8">
             {links.map(({ to, label }, i) => (
               <Link
@@ -108,7 +106,7 @@ export default function Navbar() {
           </nav>
           <div className="mt-16 pt-8 border-t border-border">
             <p className="font-ui text-[10px] tracking-widest2 uppercase text-muted">
-              hello@nawahouse.ph
+              Feel free to reach out to us on Instagram @nawasiargao
             </p>
           </div>
         </div>

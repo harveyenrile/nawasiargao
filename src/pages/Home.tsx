@@ -156,11 +156,11 @@ function HeroCarousel() {
         <img
           src="/logo-white.png"
           alt="Nawá House"
-          className="mb-8 w-auto"
+          className="mb-8 w-auto transition-opacity duration-500"
           style={{
             height: 'clamp(3rem, 6vw, 5rem)',
-            opacity: 0,
-            animation: 'fadeInUp 0.9s ease 0.3s forwards',
+            opacity: scrolled ? 0 : undefined,
+            animation: scrolled ? 'none' : 'fadeInUp 0.9s ease 0.3s forwards',
           }}
         />
 
