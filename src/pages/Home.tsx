@@ -368,55 +368,84 @@ const REVIEWS = [
   },
 ]
 
-function ReviewCard({ review }: { review: { name: string; text: string } }) {
-  return (
-    <div className="flex-shrink-0 w-[320px] md:w-[380px] bg-cream border border-border rounded-2xl px-7 py-6 flex flex-col gap-4">
-      <div className="flex gap-0.5">
-        {[...Array(5)].map((_, s) => (
-          <svg key={s} width="13" height="13" viewBox="0 0 20 20" fill="#C47A5A" aria-hidden="true">
-            <path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z" />
-          </svg>
-        ))}
-      </div>
-      <p className="font-ui text-sm font-light text-fg/80 leading-relaxed italic">
-        "{review.text}"
-      </p>
-      <p className="section-label text-fg mt-auto">{review.name}</p>
-    </div>
-  )
-}
-
 function Reviews() {
   const sectionRef = useScrollReveal()
   const doubled = [...REVIEWS, ...REVIEWS]
-
-  // Mobile carousel
-  const [activeIndex, setActiveIndex] = useState(0)
+  const trackRef = useRef<HTMLDivElement>(null)
   const touchStartX = useRef(0)
   const touchStartY = useRef(0)
-  const isDragging = useRef(false)
+  const dragStartX = useRef(0)
+  const isHorizontal = useRef<boolean | null>(null)
 
-  const goTo = useCallback((index: number) => {
-    setActiveIndex((index + REVIEWS.length) % REVIEWS.length)
+  const getTranslateX = () => {
+    if (!trackRef.current) return 0
+    return new DOMMatrix(window.getComputedStyle(trackRef.current).transform).m41
+  }
+
+  // Freeze the track at its current animated position
+  const pauseAtCurrentPosition = () => {
+    const track = trackRef.current
+    if (!track) return 0
+    const x = getTranslateX()          // read while animation still running
+    track.style.animation = 'none'
+    void track.offsetWidth              // flush so animation: none takes effect
+    track.style.transform = `translateX(${x}px)`
+    return x
+  }
+
+  // Resume marquee from wherever the track currently sits
+  const resumeFromCurrentPosition = () => {
+    const track = trackRef.current
+    if (!track) return
+    const halfWidth = track.scrollWidth / 2
+    const x = getTranslateX()
+    // Normalise into (-halfWidth, 0] using a positive divisor
+    let pos = x % halfWidth
+    if (pos > 0) pos -= halfWidth
+    const delay = -(Math.abs(pos) / halfWidth) * 150   // seconds into the 150s loop
+
+    track.style.transform = 'none'
+    void track.offsetWidth              // flush so transform clears before animation starts
+    track.style.animation = `marquee 150s linear ${delay}s infinite`
+  }
+
+  // Attach non-passive listener so we can preventDefault on horizontal drag
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    const onMove = (e: TouchEvent) => {
+      if (isHorizontal.current === true) e.preventDefault()
+    }
+    track.addEventListener('touchmove', onMove, { passive: false })
+    return () => track.removeEventListener('touchmove', onMove)
   }, [])
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
-    isDragging.current = false
+    isHorizontal.current = null
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
-    const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
-    if (dx > dy && dx > 5) isDragging.current = true
+    const dx = e.touches[0].clientX - touchStartX.current
+    const dy = e.touches[0].clientY - touchStartY.current
+
+    // Determine axis on first significant movement
+    if (isHorizontal.current === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      isHorizontal.current = Math.abs(dx) > Math.abs(dy)
+      if (isHorizontal.current) {
+        dragStartX.current = pauseAtCurrentPosition()
+      }
+    }
+
+    if (!isHorizontal.current || !trackRef.current) return
+    trackRef.current.style.transform = `translateX(${dragStartX.current + dx}px)`
   }
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!isDragging.current) return
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (Math.abs(dx) > 40) goTo(activeIndex + (dx < 0 ? 1 : -1))
-    isDragging.current = false
+  const handleTouchEnd = () => {
+    if (!isHorizontal.current) return
+    isHorizontal.current = null
+    resumeFromCurrentPosition()
   }
 
   return (
@@ -435,58 +464,37 @@ function Reviews() {
         </div>
       </div>
 
-      {/* Desktop: marquee */}
-      <div className="relative hidden md:block">
-        <div className="absolute inset-y-0 left-0 w-32 z-10 pointer-events-none"
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 w-16 md:w-32 z-10 pointer-events-none"
           style={{ background: 'linear-gradient(to right, #F0EAE0, transparent)' }} />
-        <div className="absolute inset-y-0 right-0 w-32 z-10 pointer-events-none"
+        <div className="absolute inset-y-0 right-0 w-16 md:w-32 z-10 pointer-events-none"
           style={{ background: 'linear-gradient(to left, #F0EAE0, transparent)' }} />
+
         <div
+          ref={trackRef}
           className="flex gap-5 group-hover:[animation-play-state:paused]"
           style={{ width: 'max-content', animation: 'marquee 150s linear infinite' }}
-        >
-          {doubled.map((review, i) => (
-            <ReviewCard key={i} review={review} />
-          ))}
-        </div>
-      </div>
-
-      {/* Mobile: swipeable carousel */}
-      <div className="md:hidden relative overflow-hidden">
-        <div
-          className="flex gap-5 transition-transform duration-300 ease-in-out"
-          style={{ transform: `translateX(calc(50vw - 160px - ${activeIndex * 345}px))` }}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {REVIEWS.map((review, i) => (
+          {doubled.map((review, i) => (
             <div
               key={i}
-              className="transition-opacity duration-300"
-              style={{ opacity: i === activeIndex ? 1 : 0.4 }}
-              onClick={() => goTo(i)}
+              className="flex-shrink-0 w-[320px] md:w-[380px] bg-cream border border-border rounded-2xl px-7 py-6 flex flex-col gap-4"
             >
-              <ReviewCard review={review} />
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, s) => (
+                  <svg key={s} width="13" height="13" viewBox="0 0 20 20" fill="#C47A5A" aria-hidden="true">
+                    <path d="M10 1l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 13.27l-4.78 2.51.91-5.32L2.27 6.62l5.34-.78L10 1z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="font-ui text-sm font-light text-fg/80 leading-relaxed italic">
+                "{review.text}"
+              </p>
+              <p className="section-label text-fg mt-auto">{review.name}</p>
             </div>
-          ))}
-        </div>
-
-        {/* Dot indicators */}
-        <div className="flex justify-center gap-2 mt-7">
-          {REVIEWS.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              aria-label={`Go to review ${i + 1}`}
-              className="transition-all duration-200"
-              style={{
-                width: i === activeIndex ? 20 : 6,
-                height: 6,
-                borderRadius: 9999,
-                background: i === activeIndex ? '#C47A5A' : '#CEC7BA',
-              }}
-            />
           ))}
         </div>
       </div>
