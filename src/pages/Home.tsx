@@ -372,6 +372,79 @@ function Reviews() {
   const sectionRef = useScrollReveal()
   // Duplicate for seamless loop
   const doubled = [...REVIEWS, ...REVIEWS]
+  const trackRef = useRef<HTMLDivElement>(null)
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+  const startTranslateX = useRef<number>(0)
+  const isDragging = useRef(false)
+  const isHorizontalSwipe = useRef<boolean | null>(null)
+
+  const getCurrentTranslateX = () => {
+    if (!trackRef.current) return 0
+    const matrix = new DOMMatrix(window.getComputedStyle(trackRef.current).transform)
+    return matrix.m41
+  }
+
+  // Attach non-passive touchmove to allow preventDefault during horizontal swipe
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    const onTouchMove = (e: TouchEvent) => {
+      if (isDragging.current) e.preventDefault()
+    }
+    track.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => track.removeEventListener('touchmove', onTouchMove)
+  }, [])
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    startTranslateX.current = getCurrentTranslateX()
+    isDragging.current = false
+    isHorizontalSwipe.current = null
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null || !trackRef.current) return
+    const deltaX = e.touches[0].clientX - touchStartX.current
+    const deltaY = e.touches[0].clientY - touchStartY.current
+
+    // Determine swipe axis on first significant movement
+    if (isHorizontalSwipe.current === null && (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5)) {
+      isHorizontalSwipe.current = Math.abs(deltaX) > Math.abs(deltaY)
+      if (isHorizontalSwipe.current) {
+        trackRef.current.style.animationPlayState = 'paused'
+        trackRef.current.style.transform = `translateX(${startTranslateX.current}px)`
+        isDragging.current = true
+      }
+    }
+
+    if (!isDragging.current) return
+    trackRef.current.style.transform = `translateX(${startTranslateX.current + deltaX}px)`
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDragging.current || !trackRef.current) return
+    isDragging.current = false
+
+    const currentX = getCurrentTranslateX()
+    const totalScrollPx = trackRef.current.scrollWidth / 2
+
+    // Wrap position into valid range [0, -totalScrollPx]
+    let normalizedX = currentX % -totalScrollPx
+    if (normalizedX > 0) normalizedX -= totalScrollPx
+
+    const progress = Math.abs(normalizedX) / totalScrollPx
+    const duration = 150
+    const delay = -progress * duration
+
+    trackRef.current.style.transform = ''
+    trackRef.current.style.animation = `marquee ${duration}s linear ${delay}s infinite`
+    trackRef.current.style.animationPlayState = 'running'
+
+    touchStartX.current = null
+    touchStartY.current = null
+  }
 
   return (
     <section className="bg-light py-24 md:py-32 overflow-hidden group">
@@ -400,11 +473,15 @@ function Reviews() {
           style={{ background: 'linear-gradient(to left, #F0EAE0, transparent)' }} />
 
         <div
+          ref={trackRef}
           className="flex gap-5 group-hover:[animation-play-state:paused]"
           style={{
             width: 'max-content',
             animation: 'marquee 150s linear infinite',
           }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
           {doubled.map((review, i) => (
             <div
