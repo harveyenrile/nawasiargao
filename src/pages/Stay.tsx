@@ -17,7 +17,59 @@ const galleryImages = [
   { src: '/interior/DSCF8680.webp', mobile: '/interior/DSCF8680-mobile.webp', caption: 'The shelf and bedroom corner — books, framed sunset artwork, AC, and the bed lit for the evening.' },
 ]
 
+const faqItems = [
+  {
+    q: 'What are the check-in and check-out times?',
+    a: 'Standard check-in is from 2:00 PM to 5:00 PM. Early check-in between 12:00 PM–2:00 PM is subject to availability at no extra charge. For arrivals before 12:00 PM, a ₱500 early check-in fee applies (also subject to availability).',
+  },
+  {
+    q: "What's included in the room?",
+    a: 'Each room comes with an ensuite bathroom (hot and cold shower), air conditioning, a safety deposit box, work desk, mini fridge, and Starlink internet (60–200 Mbps). Towels, bathrobes, shampoo, body wash, sleeping masks, and earplugs are also provided.',
+  },
+  {
+    q: 'How many guests can stay in a room?',
+    a: 'Maximum occupancy is 2 guests per room. Additional guests are charged ₱1,000 per person per night.',
+  },
+  {
+    q: 'Is smoking allowed?',
+    a: 'Smoking and vaping are strictly prohibited inside the room and bathroom. A designated smoking area is available within the property. Violations carry a ₱5,000 fine per incident.',
+  },
+  {
+    q: 'Is housekeeping included? How often is the room cleaned?',
+    a: 'Rooms are cleaned whenever available. For long-term stays, housekeeping is done once a week. Additional linen changes have extra charges: bathroom towels (₱500), bedsheets (₱250), and bathrobes (₱250).',
+  },
+  {
+    q: 'How far is the property from Cloud 9 and surfing spots?',
+    a: 'The property is located along the quiet part of Tourism Road in General Luna. Cloud 9 and nearby surf spots are about 5 minutes away by motorbike. Several restaurants and cafes are within walking distance. Public trikes are easily available for guests who prefer not to rent a scooter.',
+  },
+  {
+    q: 'Is there parking available?',
+    a: 'Yes, designated parking areas are available on the property. Please park properly and avoid blocking the driveway.',
+  },
+  {
+    q: 'What happens during a power outage?',
+    a: 'The property runs on solar energy. During outages, essential services remain available — outlets, lights, internet, and water.',
+  },
+  {
+    q: 'Is the property secure?',
+    a: 'Yes. The property is gated and secured with outdoor security cameras. Each room has its own safety deposit box for valuables. The two rooms face opposite verandas for added privacy.',
+  },
+  {
+    q: 'Will a host be available during my stay?',
+    a: "Hosts are mostly on-site and happy to chat. If they're off the island, they'll assist remotely via Airbnb messages or any online messenger or email you provide.",
+  },
+  {
+    q: 'Are there any noise or neighborhood considerations I should know about?',
+    a: 'The property sits in a relatively quiet area at the back of Tourism Road. Nearby establishments may occasionally host events or fiestas. Dogs live on the property and in the surrounding neighborhood. Earplugs are provided for your comfort.',
+  },
+  {
+    q: 'Are mosquitoes a concern?',
+    a: 'Mosquitoes are common especially during rainy season. We recommend bringing insect repellent for a more comfortable stay.',
+  },
+]
+
 export default function Stay() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [showMore, setShowMore] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0)
@@ -412,6 +464,49 @@ export default function Stay() {
               </picture>
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="bg-light py-20 md:py-28">
+        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
+          <p className="section-label text-muted mb-6">FAQ</p>
+          <h2
+            className="font-display font-light text-fg leading-tight mb-12"
+            style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}
+          >
+            Good to know before you arrive.
+          </h2>
+
+          <div className="flex flex-col md:flex-row gap-x-12">
+            {[faqItems.slice(0, 6), faqItems.slice(6)].map((col, colIdx) => (
+              <div key={colIdx} className="flex-1 flex flex-col">
+                {col.map((item, j) => {
+                  const i = colIdx * 6 + j
+                  const isOpen = openFaq === i
+                  return (
+                    <div key={i} className="border-t border-border last:border-b">
+                      <button
+                        onClick={() => setOpenFaq(isOpen ? null : i)}
+                        className="w-full flex items-start justify-between gap-6 py-5 text-left group"
+                      >
+                        <span className="text-sm md:text-base text-fg font-medium leading-snug">{item.q}</span>
+                        <span className="flex-shrink-0 mt-0.5 text-muted group-hover:text-accent transition-colors text-xl leading-none select-none">
+                          {isOpen ? '−' : '+'}
+                        </span>
+                      </button>
+                      <div
+                        className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+                        style={{ maxHeight: isOpen ? '300px' : '0px' }}
+                      >
+                        <p className="text-sm text-muted leading-relaxed pb-5 pr-8">{item.a}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

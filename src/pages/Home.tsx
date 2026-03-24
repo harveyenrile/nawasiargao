@@ -282,36 +282,38 @@ function Intro() {
 
         </div>
 
-        {/* Masonry grid — CSS columns */}
-        <div className="columns-2 gap-3 mt-16 md:mt-24">
-          {GALLERY.map((img, i) => (
-            <div
-              key={img.src}
-              className="break-inside-avoid mb-3 overflow-hidden group"
-            >
-              <picture>
-                <source media="(max-width: 768px)" srcSet={img.mobile} type="image/webp" />
-                <source srcSet={img.src} type="image/webp" />
-                <img
-                  src={img.src}
-                  alt={img.alt}
-                  className="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                  loading={i < 2 ? 'eager' : 'lazy'}
-                  decoding="async"
-                />
-              </picture>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA after gallery */}
-        <div className="mt-12 flex justify-center">
-          <Link to="/stay" className="btn-primary font-ui text-xs tracking-widest2 uppercase">
-            View the Rooms
-          </Link>
-        </div>
-
       </div>
+
+      {/* Masonry grid — full width, 20px gutter */}
+      <div className="columns-2 mt-16 md:mt-24 px-5" style={{ columnGap: '20px' }}>
+        {GALLERY.map((img, i) => (
+          <div
+            key={img.src}
+            className="break-inside-avoid overflow-hidden group"
+            style={{ marginBottom: '20px' }}
+          >
+            <picture>
+              <source media="(max-width: 768px)" srcSet={img.mobile} type="image/webp" />
+              <source srcSet={img.src} type="image/webp" />
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="w-full h-auto block transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                loading={i < 2 ? 'eager' : 'lazy'}
+                decoding="async"
+              />
+            </picture>
+          </div>
+        ))}
+      </div>
+
+      {/* CTA after gallery */}
+      <div className="mt-12 pb-28 md:pb-40 flex justify-center">
+        <Link to="/stay" className="btn-primary font-ui text-xs tracking-widest2 uppercase">
+          View the Rooms
+        </Link>
+      </div>
+
     </section>
   )
 }

@@ -45,15 +45,15 @@
   }
 
   .section-label {
-    @apply font-ui text-[10px] tracking-widest2 uppercase text-muted;
+    @apply font-ui text-[12px] tracking-widest2 uppercase text-muted;
   }
 
   .section-number {
-    @apply font-display text-[10rem] leading-none text-light font-light select-none;
+    @apply font-display text-[12rem] leading-none text-light font-light select-none;
   }
 
   .nav-link {
-    @apply relative font-ui text-[10px] tracking-widest2 uppercase text-muted
+    @apply relative font-ui text-[12px] tracking-widest2 uppercase text-muted
            transition-colors duration-300 hover:text-fg;
   }
 

@@ -13,7 +13,7 @@ export default function Contact() {
               className="font-display font-light text-fg leading-[1.05] text-center"
               style={{ fontSize: 'clamp(1.1rem, 2vw, 1.4rem)' }}
             >
-              Please reach us on our Instagram account{' '}
+              Please reach us on our Airbnb links or through our Instagram account{' '}
             <a
               href="https://instagram.com/nawasiargao"
               target="_blank"
