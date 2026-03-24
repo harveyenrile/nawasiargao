@@ -2,15 +2,19 @@ import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 
 const galleryImages = [
-  { src: '/interior/DSCF8061.JPG', caption: 'The bedroom — polished concrete floors, macramé wall art, and room to breathe.' },
-  { src: '/interior/DSCF8075.JPG', caption: 'Full room view with work desk, AC, and glass-partitioned bathroom.' },
-  { src: '/interior/DSCF8128.JPG', caption: 'Bed and ensuite — everything in reach without feeling crowded.' },
-  { src: '/interior/DSCF8139.JPG', caption: 'Work corner with arched mirror, art prints, and natural light.' },
-  { src: '/interior/DSCF8087.JPG', caption: 'Sitting and dining area with exposed beam ceiling.' },
-  { src: '/interior/DSCF8056.JPG', caption: 'Lounge nook — a quiet spot with a view through the palms.' },
-  { src: '/interior/DSCF8094.JPG', caption: 'Private entry with rattan chair and glass sliding door.' },
-  { src: '/interior/DSCF8125.JPG', caption: 'Open-plan living with kitchenette shelf, fridge, and sitting area.' },
-  { src: '/interior/DSCF8102.JPG', caption: 'Coffee and tea ready when you wake up.' },
+  { src: '/interior/IMG_1716.webp', mobile: '/interior/IMG_1716-mobile.webp', caption: 'The bedroom — queen bed, macramé wall art, AC, bookshelf, and polished concrete floors.' },
+  { src: '/interior/IMG_1496.webp', mobile: '/interior/IMG_1496-mobile.webp', caption: 'The ensuite — black sliding barn door, vessel sink, pendant light, and a glass shower partition.' },
+  { src: '/interior/IMG_1465.webp', mobile: '/interior/IMG_1465-mobile.webp', caption: 'The ensuite — round mirror, vessel sink, rain shower, and patterned mosaic tiles.' },
+  { src: '/interior/IMG_1509.webp', mobile: '/interior/IMG_1509-mobile.webp', caption: 'Work desk by the glass door — natural light, arched floor mirror, and framed prints.' },
+  { src: '/interior/IMG_1467.webp', mobile: '/interior/IMG_1467-mobile.webp', caption: 'The shelf — books, a reed diffuser, an umbrella, and a Nawá guidebook.' },
+  { src: '/interior/IMG_1497.webp', mobile: '/interior/IMG_1497-mobile.webp', caption: 'Bedside at dusk — the table lamp on, green pillows, and a quiet corner to wind down.' },
+  { src: '/interior/IMG_1688.webp', mobile: '/interior/IMG_1688-mobile.webp', caption: 'From the bed — macramé wall art, clothes rail, glass-partitioned ensuite, and the door to the veranda.' },
+  { src: '/interior/IMG_1480.webp', mobile: '/interior/IMG_1480-mobile.webp', caption: 'Full room from the entry — work desk, queen bed, bookshelf, AC, and concrete floors.' },
+  { src: '/interior/IMG_1843.webp', mobile: '/interior/IMG_1843-mobile.webp', caption: 'The room from the bed — macramé, floating headboard shelf, glass bathroom partition, and work desk.' },
+  { src: '/interior/IMG_1483.webp', mobile: '/interior/IMG_1483-mobile.webp', caption: 'Mancala and a succulent on the veranda table — something slow to do between surf sessions.' },
+  { src: '/interior/IMG_1699.webp', mobile: '/interior/IMG_1699-mobile.webp', caption: 'The private veranda — two wooden chairs, a table, and the bedroom just through the glass.' },
+  { src: '/interior/IMG_1476.webp', mobile: '/interior/IMG_1476-mobile.webp', caption: 'The veranda — mancala on the table, two chairs, and a view of the palms through the window above.' },
+  { src: '/interior/DSCF8680.webp', mobile: '/interior/DSCF8680-mobile.webp', caption: 'The shelf and bedroom corner — books, framed sunset artwork, AC, and the bed lit for the evening.' },
 ]
 
 export default function Stay() {
@@ -82,21 +86,23 @@ export default function Stay() {
       </section>
 
       {/* Room Detail */}
-      <section className="bg-light py-20 md:py-28">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-            {/* Image */}
-            <div className="overflow-hidden">
-              <img
-                src="/room-interior.jpg"
-                alt="Sunset Room interior"
-                className="w-full object-cover"
-                style={{ maxHeight: '600px' }}
-              />
+      <section className="bg-light">
+        <div className="flex flex-col md:flex-row items-stretch">
+            {/* Image — flush left, exactly 50vw on desktop */}
+            <div className="w-full md:w-1/2 flex-shrink-0 overflow-hidden aspect-[4/3] md:aspect-auto">
+              <picture>
+                <source media="(max-width: 768px)" srcSet="/interior/IMG_1480-mobile.webp" type="image/webp" />
+                <source srcSet="/interior/IMG_1480.webp" type="image/webp" />
+                <img
+                  src="/interior/IMG_1480.webp"
+                  alt="The shelf — books, a reed diffuser, and room to make it yours."
+                  className="w-full h-full object-cover"
+                />
+              </picture>
             </div>
 
             {/* Details */}
-            <div>
+            <div className="w-full md:w-1/2 flex flex-col justify-center py-16 md:py-28 px-8 md:px-16 lg:px-24">
               <h2
                 className="font-display font-light text-fg leading-tight mb-6"
                 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)' }}
@@ -334,7 +340,6 @@ export default function Stay() {
               </div>
             </div>
           </div>
-        </div>
       </section>
 
       {/* Gallery */}
@@ -361,11 +366,15 @@ export default function Stay() {
               onClick={() => openLightbox(i)}
               className="snap-center flex-shrink-0 w-[78vw] aspect-square overflow-hidden focus:outline-none"
             >
-              <img
-                src={img.src}
-                alt={img.caption}
-                className="w-full h-full object-cover"
-              />
+              <picture>
+                <source srcSet={img.mobile} type="image/webp" />
+                <img
+                  src={img.mobile}
+                  alt={img.caption}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </picture>
             </button>
           ))}
         </div>
@@ -392,11 +401,15 @@ export default function Stay() {
               onClick={() => openLightbox(i)}
               className="aspect-square overflow-hidden group focus:outline-none"
             >
-              <img
-                src={img.src}
-                alt={img.caption}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+              <picture>
+                <source srcSet={img.src} type="image/webp" />
+                <img
+                  src={img.src}
+                  alt={img.caption}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </picture>
             </button>
           ))}
         </div>
@@ -424,11 +437,14 @@ export default function Stay() {
             className="flex flex-col items-center max-w-4xl w-full px-16"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={galleryImages[lightboxIndex].src}
-              alt={galleryImages[lightboxIndex].caption}
-              className="max-h-[75vh] w-full object-contain"
-            />
+            <picture>
+              <source srcSet={galleryImages[lightboxIndex].src} type="image/webp" />
+              <img
+                src={galleryImages[lightboxIndex].src}
+                alt={galleryImages[lightboxIndex].caption}
+                className="max-h-[75vh] w-full object-contain"
+              />
+            </picture>
             <p className="mt-4 text-white/60 text-sm text-center">
               {galleryImages[lightboxIndex].caption}
             </p>
