@@ -5,6 +5,7 @@ import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Stay from './pages/Stay'
+import Explore from './pages/Explore'
 import Contact from './pages/Contact'
 import NotFound from './pages/NotFound'
 
@@ -27,6 +28,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/stay" element={<Stay />} />
+            <Route path="/explore" element={<Explore />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

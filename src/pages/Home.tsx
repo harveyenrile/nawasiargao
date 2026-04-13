@@ -57,6 +57,7 @@ const INTERVAL = 5000
 const NAV_LINKS = [
   { to: '/', label: 'Home' },
   { to: '/stay', label: 'Stay' },
+  { to: '/explore', label: 'Explore' },
   { to: '/contact', label: 'Contact' },
 ]
 
